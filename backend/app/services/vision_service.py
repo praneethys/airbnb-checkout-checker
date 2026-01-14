@@ -1,9 +1,11 @@
-import anthropic
 import base64
-from pathlib import Path
+
+import anthropic
+
 from ..config import settings
 
 client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+
 
 async def analyze_room_photo(image_path: str, checklist_items: list[str], room_name: str) -> dict:
     """Analyze a room photo using Claude's vision to detect missing items and damage."""
@@ -38,20 +40,24 @@ Respond in JSON format:
     response = await client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=1024,
-        messages=[{
-            "role": "user",
-            "content": [
-                {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": image_data}},
-                {"type": "text", "text": prompt}
-            ]
-        }]
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": image_data}},
+                    {"type": "text", "text": prompt},
+                ],
+            }
+        ],
     )
 
     import json
+
     try:
         return json.loads(response.content[0].text)
     except json.JSONDecodeError:
         return {"missing_items": [], "damage_detected": [], "cleanliness_issues": [], "condition_score": 5}
+
 
 async def compare_photos(before_path: str, after_path: str, room_name: str) -> dict:
     """Compare before/after photos to detect changes and damage."""
@@ -86,18 +92,27 @@ Respond in JSON format:
     response = await client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=1024,
-        messages=[{
-            "role": "user",
-            "content": [
-                {"type": "image", "source": {"type": "base64", "media_type": before_type, "data": before_data}},
-                {"type": "image", "source": {"type": "base64", "media_type": after_type, "data": after_data}},
-                {"type": "text", "text": prompt}
-            ]
-        }]
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image", "source": {"type": "base64", "media_type": before_type, "data": before_data}},
+                    {"type": "image", "source": {"type": "base64", "media_type": after_type, "data": after_data}},
+                    {"type": "text", "text": prompt},
+                ],
+            }
+        ],
     )
 
     import json
+
     try:
         return json.loads(response.content[0].text)
     except json.JSONDecodeError:
-        return {"new_damage": [], "missing_items": [], "condition_change": "same", "recommended_claim": False, "estimated_damage_cost": 0}
+        return {
+            "new_damage": [],
+            "missing_items": [],
+            "condition_change": "same",
+            "recommended_claim": False,
+            "estimated_damage_cost": 0,
+        }
