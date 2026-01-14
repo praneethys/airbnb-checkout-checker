@@ -21,9 +21,19 @@ export function HomePage() {
       <section style={{ marginTop: '2rem' }}>
         <h2>Add Property</h2>
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-          <input placeholder="Property name" value={newProp.name} onChange={e => setNewProp({ ...newProp, name: e.target.value })} />
-          <input placeholder="Address" value={newProp.address} onChange={e => setNewProp({ ...newProp, address: e.target.value })} />
-          <button onClick={handleCreate} disabled={createProperty.isPending}>Add</button>
+          <input
+            placeholder="Property name"
+            value={newProp.name}
+            onChange={(e) => setNewProp({ ...newProp, name: e.target.value })}
+          />
+          <input
+            placeholder="Address"
+            value={newProp.address}
+            onChange={(e) => setNewProp({ ...newProp, address: e.target.value })}
+          />
+          <button onClick={handleCreate} disabled={createProperty.isPending}>
+            Add
+          </button>
         </div>
       </section>
 
@@ -33,7 +43,7 @@ export function HomePage() {
           <p>Loading...</p>
         ) : properties?.length ? (
           <ul>
-            {properties.map(p => (
+            {properties.map((p) => (
               <li key={p.id} style={{ marginBottom: '0.5rem' }}>
                 <Link to={`/property/${p.id}`}>{p.name}</Link>
                 {p.address && <span style={{ color: '#666' }}> - {p.address}</span>}
