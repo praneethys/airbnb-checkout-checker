@@ -1,11 +1,14 @@
+import os
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from contextlib import asynccontextmanager
-import os
-from .database import init_db
+
 from .api import router
 from .config import settings
+from .database import init_db
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -13,11 +16,8 @@ async def lifespan(app: FastAPI):
     os.makedirs(settings.upload_dir, exist_ok=True)
     yield
 
-app = FastAPI(
-    title="Airbnb Checkout Checker",
-    version="1.0.0",
-    lifespan=lifespan
-)
+
+app = FastAPI(title="Airbnb Checkout Checker", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
