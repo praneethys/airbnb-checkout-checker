@@ -10,10 +10,12 @@ from .config import settings
 from .database import init_db
 
 
+os.makedirs(settings.upload_dir, exist_ok=True)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
-    os.makedirs(settings.upload_dir, exist_ok=True)
     yield
 
 
