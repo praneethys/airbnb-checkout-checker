@@ -1,8 +1,11 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text, Enum
-from sqlalchemy.orm import relationship
-from datetime import datetime
 import enum
+from datetime import datetime
+
+from sqlalchemy import Column, DateTime, Enum, Float, ForeignKey, Integer, String, Text
+from sqlalchemy.orm import relationship
+
 from ..database import Base
+
 
 class RoomType(str, enum.Enum):
     BEDROOM = "bedroom"
@@ -11,9 +14,11 @@ class RoomType(str, enum.Enum):
     LIVING_ROOM = "living_room"
     OTHER = "other"
 
+
 class CheckType(str, enum.Enum):
     CHECKIN = "checkin"
     CHECKOUT = "checkout"
+
 
 class Property(Base):
     __tablename__ = "properties"
@@ -24,6 +29,7 @@ class Property(Base):
     rooms = relationship("Room", back_populates="property", cascade="all, delete-orphan")
     checks = relationship("Check", back_populates="property", cascade="all, delete-orphan")
 
+
 class Room(Base):
     __tablename__ = "rooms"
     id = Column(Integer, primary_key=True)
@@ -33,6 +39,7 @@ class Room(Base):
     property = relationship("Property", back_populates="rooms")
     checklist_items = relationship("ChecklistItem", back_populates="room", cascade="all, delete-orphan")
 
+
 class ChecklistItem(Base):
     __tablename__ = "checklist_items"
     id = Column(Integer, primary_key=True)
@@ -40,6 +47,7 @@ class ChecklistItem(Base):
     name = Column(String(255), nullable=False)
     replacement_cost = Column(Float, default=0.0)
     room = relationship("Room", back_populates="checklist_items")
+
 
 class Check(Base):
     __tablename__ = "checks"
@@ -52,6 +60,7 @@ class Check(Base):
     photos = relationship("Photo", back_populates="check", cascade="all, delete-orphan")
     issues = relationship("Issue", back_populates="check", cascade="all, delete-orphan")
 
+
 class Photo(Base):
     __tablename__ = "photos"
     id = Column(Integer, primary_key=True)
@@ -61,6 +70,7 @@ class Photo(Base):
     analysis_result = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
     check = relationship("Check", back_populates="photos")
+
 
 class Issue(Base):
     __tablename__ = "issues"

@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     database_url: str = "sqlite+aiosqlite:///./checkout.db"
     anthropic_api_key: str = ""
@@ -7,5 +8,6 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+
 
 settings = Settings()
