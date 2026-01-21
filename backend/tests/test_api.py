@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestProperties:
     async def test_create_property(self, client):
         response = await client.post("/api/properties", json={"name": "Beach House", "address": "123 Ocean Ave"})
@@ -52,7 +49,9 @@ class TestRooms:
         # Create a property and room
         prop_response = await client.post("/api/properties", json={"name": "Test Property"})
         property_id = prop_response.json()["id"]
-        await client.post(f"/api/properties/{property_id}/rooms", json={"name": "Living Room", "room_type": "living_room"})
+        await client.post(
+            f"/api/properties/{property_id}/rooms", json={"name": "Living Room", "room_type": "living_room"}
+        )
 
         response = await client.get(f"/api/properties/{property_id}/rooms")
         assert response.status_code == 200
@@ -71,7 +70,9 @@ class TestChecklistItems:
         )
         room_id = room_response.json()["id"]
 
-        response = await client.post(f"/api/rooms/{room_id}/items", json={"name": "Coffee Maker", "replacement_cost": 50.0})
+        response = await client.post(
+            f"/api/rooms/{room_id}/items", json={"name": "Coffee Maker", "replacement_cost": 50.0}
+        )
         assert response.status_code == 200
         data = response.json()
         assert data["name"] == "Coffee Maker"
@@ -124,7 +125,9 @@ class TestChecks:
         # Create property and check
         prop_response = await client.post("/api/properties", json={"name": "Test Property"})
         property_id = prop_response.json()["id"]
-        await client.post(f"/api/properties/{property_id}/checks", json={"check_type": "checkin", "guest_name": "Guest"})
+        await client.post(
+            f"/api/properties/{property_id}/checks", json={"check_type": "checkin", "guest_name": "Guest"}
+        )
 
         response = await client.get(f"/api/properties/{property_id}/checks")
         assert response.status_code == 200

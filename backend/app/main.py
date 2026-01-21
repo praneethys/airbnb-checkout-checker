@@ -9,7 +9,6 @@ from .api import router
 from .config import settings
 from .database import init_db
 
-
 os.makedirs(settings.upload_dir, exist_ok=True)
 
 

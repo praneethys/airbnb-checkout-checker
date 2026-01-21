@@ -216,9 +216,7 @@ async def generate_damage_report(
     }
 
     # Get items that were present at check-in (documented in checklist)
-    checkin_present_items = {
-        i.item_name for i in checkin.issues if i.item_name
-    }
+    checkin_present_items = {i.item_name for i in checkin.issues if i.item_name}
     # Items from checklist that weren't flagged as missing at check-in were present
     checkin_rooms = {p.room_id for p in checkin.photos}
 
