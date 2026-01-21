@@ -30,8 +30,7 @@ import {
   StatNumber,
   Divider,
   Alert,
-  AlertIcon,
-  useDisclosure,
+  AlertIcon
 } from '@chakra-ui/react';
 import {
   FiArrowLeft,
