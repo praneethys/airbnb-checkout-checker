@@ -210,16 +210,45 @@ async def generate_damage_report(
                 }
             )
 
-    total_cost = sum(i.estimated_cost for i in checkout.issues)
+    # Get items that were already missing at check-in (not guest's responsibility)
+    checkin_missing_items = {
+        i.item_name for i in checkin.issues if i.item_name and i.description.startswith("Missing:")
+    }
+
+    # Get items that were present at check-in (documented in checklist)
+    checkin_present_items = {
+        i.item_name for i in checkin.issues if i.item_name
+    }
+    # Items from checklist that weren't flagged as missing at check-in were present
+    checkin_rooms = {p.room_id for p in checkin.photos}
+
+    # Categorize checkout issues
+    guest_responsible_issues: list[Issue] = []
+    lost_and_found_items: list[str] = []
+
+    for issue in checkout.issues:
+        if issue.item_name and issue.description.startswith("Missing:"):
+            if issue.item_name in checkin_missing_items:
+                # Already missing at check-in, skip (not guest's fault)
+                continue
+            elif issue.item_name not in checkin_present_items and checkin_rooms:
+                # Item wasn't checked at check-in - could be guest's item left behind
+                lost_and_found_items.append(issue.item_name)
+                continue
+        # All other issues (damage, or items that went missing during stay)
+        guest_responsible_issues.append(issue)
+
+    total_cost: float = sum(i.estimated_cost for i in guest_responsible_issues)  # type: ignore[misc]
 
     return {
         "property_name": prop.name,
         "guest_name": checkout.guest_name,
         "checkin_date": checkin.created_at,
         "checkout_date": checkout.created_at,
-        "issues": [IssueResponse.model_validate(i) for i in checkout.issues],
+        "issues": [IssueResponse.model_validate(i) for i in guest_responsible_issues],
         "total_estimated_cost": total_cost,
         "comparison_photos": comparisons,
+        "lost_and_found": lost_and_found_items,
     }
 
 
