@@ -1,5 +1,9 @@
 # Airbnb Checkout Checker
 
+[![CI](https://github.com/praneethyerrapragada/airbnb-checkout-checker/actions/workflows/ci.yml/badge.svg)](https://github.com/praneethyerrapragada/airbnb-checkout-checker/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/praneethyerrapragada/airbnb-checkout-checker/branch/main/graph/badge.svg)](https://codecov.io/gh/praneethyerrapragada/airbnb-checkout-checker)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Photo-based property inspection tool for part-time Airbnb hosts managing 1-2 properties.
 
 ## Features
