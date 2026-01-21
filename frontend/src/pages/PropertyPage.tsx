@@ -30,7 +30,7 @@ import {
   StatNumber,
   Divider,
   Alert,
-  AlertIcon
+  AlertIcon,
 } from '@chakra-ui/react';
 import {
   FiArrowLeft,
@@ -117,7 +117,10 @@ export function PropertyPage() {
                 <Select
                   value={newRoom.room_type}
                   onChange={(e) =>
-                    setNewRoom({ ...newRoom, room_type: e.target.value as typeof newRoom.room_type })
+                    setNewRoom({
+                      ...newRoom,
+                      room_type: e.target.value as typeof newRoom.room_type,
+                    })
                   }
                   w="200px"
                 >
@@ -232,7 +235,12 @@ export function PropertyPage() {
                       <Box pt={4}>
                         <VStack align="stretch" spacing={3}>
                           {rooms?.map((r) => (
-                            <PhotoUpload key={r.id} checkId={c.id} roomId={r.id} roomName={r.name} />
+                            <PhotoUpload
+                              key={r.id}
+                              checkId={c.id}
+                              roomId={r.id}
+                              roomName={r.name}
+                            />
                           ))}
                         </VStack>
                       </Box>
