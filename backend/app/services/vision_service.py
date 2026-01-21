@@ -1,21 +1,34 @@
 import base64
+import json
+from typing import Literal, TypedDict
 
-import anthropic
+import ollama
 
 from ..config import settings
 
-client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+client: ollama.AsyncClient = ollama.AsyncClient(host=settings.ollama_host)
 
 
-async def analyze_room_photo(image_path: str, checklist_items: list[str], room_name: str) -> dict:
-    """Analyze a room photo using Claude's vision to detect missing items and damage."""
+class RoomAnalysisResult(TypedDict):
+    missing_items: list[str]
+    damage_detected: list[str]
+    cleanliness_issues: list[str]
+    condition_score: int
+
+
+class PhotoComparisonResult(TypedDict):
+    new_damage: list[str]
+    missing_items: list[str]
+    condition_change: Literal["better", "same", "worse"]
+    recommended_claim: bool
+    estimated_damage_cost: float
+
+
+async def analyze_room_photo(image_path: str, checklist_items: list[str], room_name: str) -> RoomAnalysisResult:
+    """Analyze a room photo using Ollama vision model to detect missing items and damage."""
 
     with open(image_path, "rb") as f:
-        image_data = base64.standard_b64encode(f.read()).decode("utf-8")
-
-    media_type = "image/jpeg"
-    if image_path.lower().endswith(".png"):
-        media_type = "image/png"
+        image_data = base64.b64encode(f.read()).decode("utf-8")
 
     checklist_str = "\n".join(f"- {item}" for item in checklist_items)
 
@@ -29,7 +42,7 @@ Please identify:
 2. Any visible DAMAGE to furniture, walls, floors, or items
 3. Overall cleanliness issues
 
-Respond in JSON format:
+Respond in JSON format only, no markdown or explanation:
 {{
     "missing_items": ["item1", "item2"],
     "damage_detected": ["description of damage 1"],
@@ -37,39 +50,35 @@ Respond in JSON format:
     "condition_score": 1-10
 }}"""
 
-    response = await client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=1024,
+    response = await client.chat(  # type: ignore[attr-defined]
+        model=settings.ollama_model,
         messages=[
             {
                 "role": "user",
-                "content": [
-                    {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": image_data}},
-                    {"type": "text", "text": prompt},
-                ],
+                "content": prompt,
+                "images": [image_data],
             }
         ],
     )
 
-    import json
-
     try:
-        return json.loads(response.content[0].text)
-    except json.JSONDecodeError:
+        text = response["message"]["content"].strip()
+        if text.startswith("```"):
+            text = text.split("\n", 1)[1].rsplit("```", 1)[0]
+        return json.loads(text)
+    except (json.JSONDecodeError, KeyError, IndexError):
         return {"missing_items": [], "damage_detected": [], "cleanliness_issues": [], "condition_score": 5}
 
 
-async def compare_photos(before_path: str, after_path: str, room_name: str) -> dict:
+async def compare_photos(before_path: str, after_path: str, room_name: str) -> PhotoComparisonResult:
     """Compare before/after photos to detect changes and damage."""
 
-    def load_image(path: str) -> tuple[str, str]:
+    def load_image(path: str) -> str:
         with open(path, "rb") as f:
-            data = base64.standard_b64encode(f.read()).decode("utf-8")
-        media_type = "image/png" if path.lower().endswith(".png") else "image/jpeg"
-        return data, media_type
+            return base64.b64encode(f.read()).decode("utf-8")
 
-    before_data, before_type = load_image(before_path)
-    after_data, after_type = load_image(after_path)
+    before_data = load_image(before_path)
+    after_data = load_image(after_path)
 
     prompt = f"""Compare these two photos of a {room_name}.
 The first image is BEFORE the guest stay (check-in).
@@ -80,7 +89,7 @@ Identify:
 2. Any items that are now MISSING
 3. Significant changes in condition
 
-Respond in JSON format:
+Respond in JSON format only, no markdown or explanation:
 {{
     "new_damage": ["description"],
     "missing_items": ["item"],
@@ -89,26 +98,23 @@ Respond in JSON format:
     "estimated_damage_cost": 0.00
 }}"""
 
-    response = await client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=1024,
+    response = await client.chat(  # type: ignore[attr-defined]
+        model=settings.ollama_model,
         messages=[
             {
                 "role": "user",
-                "content": [
-                    {"type": "image", "source": {"type": "base64", "media_type": before_type, "data": before_data}},
-                    {"type": "image", "source": {"type": "base64", "media_type": after_type, "data": after_data}},
-                    {"type": "text", "text": prompt},
-                ],
+                "content": prompt,
+                "images": [before_data, after_data],
             }
         ],
     )
 
-    import json
-
     try:
-        return json.loads(response.content[0].text)
-    except json.JSONDecodeError:
+        text = response["message"]["content"].strip()
+        if text.startswith("```"):
+            text = text.split("\n", 1)[1].rsplit("```", 1)[0]
+        return json.loads(text)
+    except (json.JSONDecodeError, KeyError, IndexError):
         return {
             "new_damage": [],
             "missing_items": [],
