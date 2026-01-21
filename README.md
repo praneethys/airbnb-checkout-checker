@@ -87,3 +87,11 @@ cd frontend && npm run lint && npm run format
 ### VSCode
 
 Recommended extensions will be suggested on open. Format on save is enabled.
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
