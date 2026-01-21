@@ -13,12 +13,15 @@ Photo-based property inspection tool for part-time Airbnb hosts managing 1-2 pro
 ## Tech Stack
 
 - **Backend**: FastAPI, SQLAlchemy (async), SQLite, Pydantic
-- **Frontend**: React, Vite, TanStack Query, Zod
-- **AI**: Claude Sonnet (vision analysis)
+- **Frontend**: React, Vite, TanStack Query, Zod, Chakra UI
+- **AI**: Ollama with LLaVA (local vision model)
 
 ## Quick Start
 
 ```bash
+# Make sure Ollama is running with llava model
+ollama pull llava
+
 ./run.sh
 ```
 
@@ -33,7 +36,7 @@ See [backend/README.md](backend/README.md) for detailed setup, API docs, and env
 ```bash
 cd backend
 poetry install
-cp .env.example .env  # Add your ANTHROPIC_API_KEY
+cp .env.example .env
 poetry run uvicorn app.main:app --reload
 ```
 

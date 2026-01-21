@@ -5,8 +5,11 @@ FastAPI backend for the Airbnb Checkout Checker.
 ## Setup
 
 ```bash
+# Start Ollama with a vision model
+ollama pull llava
+
 poetry install
-cp .env.example .env  # Add ANTHROPIC_API_KEY
+cp .env.example .env
 poetry run uvicorn app.main:app --reload
 ```
 
@@ -21,7 +24,7 @@ app/
 ├── api/routes.py       # API endpoints
 ├── models/models.py    # SQLAlchemy models
 ├── schemas/schemas.py  # Pydantic schemas
-├── services/           # Claude vision integration
+├── services/           # Ollama vision integration
 ├── config.py           # Settings
 ├── database.py         # Async SQLite setup
 └── main.py             # FastAPI app
@@ -51,6 +54,7 @@ poetry run ruff format .         # Format
 
 | Variable | Description |
 |----------|-------------|
-| `ANTHROPIC_API_KEY` | Claude API key for vision analysis |
+| `OLLAMA_HOST` | Ollama server URL (default: `http://localhost:11434`) |
+| `OLLAMA_MODEL` | Vision model to use (default: `llava`) |
 | `DATABASE_URL` | SQLite path (default: `sqlite+aiosqlite:///./checkout.db`) |
 | `UPLOAD_DIR` | Photo storage path (default: `./uploads`) |
