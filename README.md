@@ -7,33 +7,57 @@ Photo-based property inspection tool for part-time Airbnb hosts managing 1-2 pro
 - Photo checklist for each room (before/after guest stays)
 - AI-powered detection of missing items (towels, remotes, etc.)
 - Damage detection with before/after comparison
-- Damage claim report generation
+- Damage claim report generation (excludes pre-existing issues)
+- Lost and found tracking for guest belongings
 - Replacement cost tracking over time
 
 ## Tech Stack
 
 - **Backend**: FastAPI, SQLAlchemy (async), SQLite, Pydantic
 - **Frontend**: React, Vite, TanStack Query, Zod, Chakra UI
-- **AI**: Ollama with LLaVA (local vision model)
+- **AI**: Ollama with LLaVA (local vision model - runs locally, no API keys needed)
 
-## Quick Start
+## One-Click Setup (Recommended)
+
+For first-time users, run the setup script that installs everything automatically:
 
 ```bash
-# Make sure Ollama is running with llava model
-ollama pull llava
+./setup.sh
+```
 
+This will:
+- Install Python, Node.js, and Poetry (if not already installed)
+- Install and start Ollama
+- Download the LLaVA vision model
+- Install all project dependencies
+- Create configuration files
+
+After setup completes, start the app with:
+
+```bash
 ./run.sh
 ```
 
-This starts both backend (http://localhost:8000) and frontend (http://localhost:5173).
+Then open http://localhost:5173 in your browser.
 
-## Setup
+## Manual Setup
+
+If you prefer to set things up manually:
+
+### Prerequisites
+
+- Python 3.11+
+- Node.js 18+
+- [Ollama](https://ollama.com) with the `llava` model
 
 ### Backend
 
 See [backend/README.md](backend/README.md) for detailed setup, API docs, and environment variables.
 
 ```bash
+# Install and start Ollama with vision model
+ollama pull llava
+
 cd backend
 poetry install
 cp .env.example .env
